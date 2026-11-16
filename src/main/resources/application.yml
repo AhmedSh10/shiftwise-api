@@ -17,6 +17,10 @@ shiftwise:
     # 32+ characters. Override with JWT_SECRET outside local development.
     secret: ${JWT_SECRET:local-dev-secret-change-me-please-32chars}
     ttl-minutes: ${JWT_TTL_MINUTES:480}
+  rules:
+    # Minimum rest between the end of one working day and the start of the next.
+    # 11 h is the Italian legal minimum (D.Lgs. 66/2003); a collective agreement may differ.
+    min-rest-hours: ${MIN_REST_HOURS:11}
 
 springdoc:
   swagger-ui:

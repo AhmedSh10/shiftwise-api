@@ -1,18 +1,7 @@
 package io.github.ahmedsh10.shiftwise.web;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -21,53 +10,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Runs against a real PostgreSQL in Docker, with the Flyway demo data
- * (areas 1 WARDS, 3 KITCHEN, 4 DISHWASH, 6 OFFICES; shifts 2 MORNING, 3 AFTERNOON, 4 SPLIT, 5 EVENING).
- * Each test uses its own date so tests do not depend on each other.
- */
-@SpringBootTest
-@AutoConfigureMockMvc
-@Testcontainers
-class ApiIntegrationTest {
+/** Week 1: authentication, roles, skill and overlap rules, coverage board. */
+class ApiIntegrationTest extends IntegrationTestBase {
 
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
-    private static final String SUPERVISOR = "giulia.ferri@demo.dev";
     private static final String EMPLOYEE = "sara.conti@demo.dev";
-    private static final String PASSWORD = "demo1234";
 
     // Demo employees and their skills
     private static final long SARA = 4;     // WARDS, CORRIDORS
     private static final long FATIMA = 6;   // WARDS, OFFICES
     private static final long ELENA = 8;    // KITCHEN, DISHWASH
-
-    @Autowired
-    MockMvc mvc;
-
-    @Autowired
-    ObjectMapper json;
-
-    private String login(String email) throws Exception {
-        String body = mvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"" + email + "\",\"password\":\"" + PASSWORD + "\"}"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        JsonNode node = json.readTree(body);
-        return "Bearer " + node.get("token").asText();
-    }
-
-    private ResultActions assign(String token, long employeeId, long areaId, long shiftId, String date) throws Exception {
-        String body = "{\"employeeId\":%d,\"areaId\":%d,\"shiftTemplateId\":%d,\"date\":\"%s\"}"
-                .formatted(employeeId, areaId, shiftId, date);
-        return mvc.perform(post("/api/assignments")
-                .header("Authorization", token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body));
-    }
 
     @Test
     void wrongPasswordIsRejected() throws Exception {

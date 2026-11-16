@@ -5,7 +5,10 @@ public record RuleViolation(Rule rule, String message) {
 
     public enum Rule {
         EMPLOYEE_INACTIVE,
+        EMPLOYEE_ABSENT,
         NOT_QUALIFIED_FOR_AREA,
-        OVERLAPPING_SHIFT
+        OVERLAPPING_SHIFT,
+        INSUFFICIENT_REST,
+        WEEKLY_HOURS_EXCEEDED
     }
 }

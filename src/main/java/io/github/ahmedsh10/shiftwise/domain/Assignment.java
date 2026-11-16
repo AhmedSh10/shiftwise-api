@@ -46,6 +46,11 @@ public class Assignment {
         this.workDate = workDate;
     }
 
+    /** Hands this shift over to another employee (used by approved swaps). */
+    public void reassignTo(Employee newEmployee) {
+        this.employee = newEmployee;
+    }
+
     public Long getId() {
         return id;
     }

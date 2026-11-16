@@ -26,13 +26,18 @@ public class AssignmentService {
     private final EmployeeRepository employees;
     private final AreaRepository areas;
     private final ShiftTemplateRepository templates;
+    private final ScheduleContextLoader contextLoader;
+    private final RuleSettings ruleSettings;
 
     public AssignmentService(AssignmentRepository assignments, EmployeeRepository employees,
-                             AreaRepository areas, ShiftTemplateRepository templates) {
+                             AreaRepository areas, ShiftTemplateRepository templates,
+                             ScheduleContextLoader contextLoader, RuleSettings ruleSettings) {
         this.assignments = assignments;
         this.employees = employees;
         this.areas = areas;
         this.templates = templates;
+        this.contextLoader = contextLoader;
+        this.ruleSettings = ruleSettings;
     }
 
     @Transactional(readOnly = true)
@@ -49,15 +54,17 @@ public class AssignmentService {
 
     @Transactional
     public AssignmentResponse create(CreateAssignmentRequest request) {
-        Employee employee = employees.findWithSkillsById(request.employeeId())
+        // Lock the employee row first: concurrent requests for the same person now run one at a time,
+        // so the second one sees the first one's assignment when it checks for overlaps.
+        Employee employee = employees.findByIdForUpdate(request.employeeId())
                 .orElseThrow(() -> new NotFoundException("Employee", request.employeeId()));
         Area area = areas.findById(request.areaId())
                 .orElseThrow(() -> new NotFoundException("Area", request.areaId()));
         ShiftTemplate shift = templates.findById(request.shiftTemplateId())
                 .orElseThrow(() -> new NotFoundException("Shift template", request.shiftTemplateId()));
 
-        List<Assignment> sameDay = assignments.findByEmployeeIdAndWorkDate(employee.getId(), request.date());
-        List<RuleViolation> violations = AssignmentRules.check(employee, area, shift, request.date(), sameDay);
+        ScheduleContext context = contextLoader.load(employee.getId(), request.date());
+        List<RuleViolation> violations = AssignmentRules.check(employee, area, shift, request.date(), context, ruleSettings);
         if (!violations.isEmpty()) {
             throw new RuleViolationException(violations);
         }

@@ -1,6 +1,7 @@
 package io.github.ahmedsh10.shiftwise.web;
 
 import io.github.ahmedsh10.shiftwise.service.ConflictException;
+import io.github.ahmedsh10.shiftwise.service.ForbiddenException;
 import io.github.ahmedsh10.shiftwise.service.NotFoundException;
 import io.github.ahmedsh10.shiftwise.service.RuleViolationException;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     ProblemDetail conflict(ConflictException e) {
         return problem(HttpStatus.CONFLICT, "Conflict", e.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    ProblemDetail forbidden(ForbiddenException e) {
+        return problem(HttpStatus.FORBIDDEN, "Forbidden", e.getMessage());
     }
 
     /** 422: the request is well formed, but it breaks a scheduling rule. */

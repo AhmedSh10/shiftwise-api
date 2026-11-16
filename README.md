@@ -24,14 +24,16 @@ On a hospital site the schedule is still built by hand by supervisors, and it br
 | **Areas and headcount** | Each area (wards, stairs, kitchen, kitchen wash, corridors, offices) declares how many people it needs per shift |
 | **Skills** | Each employee lists the areas they can work in. Assigning someone elsewhere is rejected |
 | **Split shifts** | A shift is a list of time segments, so a split shift counts 6.5 worked hours, not 8.5, and a shift in its gap does not clash |
-| **Rule checks** | Every assignment is checked before it is saved. A broken rule returns `422` with the rule name |
+| **Rule checks** | Every assignment is checked before it is saved: skills, overlaps, rest between days, weekly contract hours, absences. A broken rule returns `422` with the rule name |
+| **Absences** | Recording an absence cancels that person's shifts in the period and returns them, so the gaps are visible at once |
+| **Shift swaps** | Employee offers a shift, the colleague accepts, a supervisor approves. Rules are checked for the colleague at request and again at approval |
 | **Coverage board** | For any day: required vs assigned per area and shift, with a GREEN / YELLOW / RED status |
 | **Roles** | `ADMIN`, `SUPERVISOR`, `EMPLOYEE`, with JWT authentication |
 
 ### Roadmap
 
 - [x] **Week 1:** domain model, JWT and roles, assignments with skill and overlap checks, coverage board, Testcontainers tests, Docker, CI
-- [ ] **Week 2:** 11-hour rest rule between shifts, weekly contract hours, absences, shift swap requests
+- [x] **Week 2:** 11-hour rest rule between working days, weekly contract hours, absences, shift swaps, row lock against concurrent overlapping bookings
 - [ ] **Week 3:** replacement suggestions when someone is absent, weekly schedule generation
 
 ## Run it
@@ -88,6 +90,12 @@ curl -s "localhost:8080/api/coverage?date=2026-11-09" -H "Authorization: Bearer 
 | `PATCH` | `/api/employees/{id}/active?value=` | admin |
 | `GET` | `/api/assignments?from=&to=` | signed in |
 | `POST` `DELETE` | `/api/assignments` | supervisor |
+| `GET` `POST` `DELETE` | `/api/absences` | supervisor |
+| `POST` | `/api/swaps` | employee (own shift) |
+| `GET` | `/api/swaps?openOnly=` | supervisor: all, employee: own |
+| `POST` | `/api/swaps/{id}/accept` | the colleague asked |
+| `POST` | `/api/swaps/{id}/approve` | supervisor |
+| `POST` | `/api/swaps/{id}/reject`, `/cancel` | colleague or supervisor / requester |
 
 Errors follow RFC 7807. A rule violation looks like this:
 
@@ -105,6 +113,8 @@ Errors follow RFC 7807. A rule violation looks like this:
 - **Rules are plain Java.** `AssignmentRules` has no Spring or database code, so it is unit-tested directly and will be reused to rank replacement candidates.
 - **Split shifts as segments.** `ShiftTemplate` holds an ordered list of `ShiftSegment`s. Overlap and worked time are computed segment by segment.
 - **Double booking.** Two supervisors assigning the same person to the same shift at the same moment is stopped by a unique key, and returned as `409`.
+- **Overlapping bookings under load.** A unique key cannot stop two *different* shifts that overlap. Every write to someone's schedule first takes `SELECT ... FOR UPDATE` on their employee row, so concurrent requests for one person run one after the other. Swap approvals lock both people in id order, so they cannot deadlock.
+- **Rest is between working days.** It is measured from the last end of one day to the first start of the next. The minimum is `shiftwise.rules.min-rest-hours` (default 11, the Italian legal minimum), because a collective agreement may set a different value.
 - **Schema owned by Flyway.** Hibernate only validates it.
 
 ## Tech

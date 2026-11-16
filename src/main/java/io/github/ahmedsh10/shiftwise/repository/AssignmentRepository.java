@@ -15,4 +15,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     List<Assignment> findByWorkDate(LocalDate workDate);
 
     long countByAreaIdAndShiftTemplateIdAndWorkDate(Long areaId, Long shiftTemplateId, LocalDate workDate);
+
+    List<Assignment> findByEmployeeIdAndWorkDateBetween(Long employeeId, LocalDate from, LocalDate to);
 }
