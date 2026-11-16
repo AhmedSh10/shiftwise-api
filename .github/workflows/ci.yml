@@ -16,6 +16,8 @@ jobs:
           java-version: '21'
           cache: maven
       - name: Build and test (Testcontainers uses the runner's Docker)
+        env:
+          DOCKER_API_VERSION: '1.44'
         run: mvn -B verify
       - name: Upload test reports
         if: failure()
