@@ -9,6 +9,8 @@ Shift scheduling for facility-services teams: the cleaning crews that keep a hos
 
 Inspired by real work on a hospital cleaning contract in Milan. All data in this repository is invented.
 
+![Coverage board: areas by shift, green, yellow and red cells, and ranked replacements for the selected slot](docs/coverage-board.png)
+
 ## The problem
 
 On a hospital site the schedule is still built by hand by supervisors, and it breaks in three ways:
@@ -36,6 +38,8 @@ On a hospital site the schedule is still built by hand by supervisors, and it br
 
 - [x] **Week 1:** domain model, JWT and roles, assignments with skill and overlap checks, coverage board, Testcontainers tests, Docker, CI
 - [x] **Week 2:** 11-hour rest rule between working days, weekly contract hours, absences, shift swaps, row lock against concurrent overlapping bookings
+- [x] **Web app:** supervisor board served by Spring Boot (plain HTML, CSS and JavaScript): week strip, coverage grid, mark absent, ranked replacements, fill the week with preview
+- [ ] **Live demo:** deploy with a daily data reset
 - [x] **Week 3:** replacement suggestions when someone is absent, weekly schedule generation with dry run
 
 ## Run it
@@ -46,7 +50,8 @@ You need Docker.
 docker compose up --build
 ```
 
-- API: http://localhost:8080
+- Supervisor board: http://localhost:8080 (click **Try it as a supervisor**)
+- API: http://localhost:8080/api
 - Swagger UI: http://localhost:8080/swagger-ui.html
 
 ### Demo accounts (password `demo1234`)

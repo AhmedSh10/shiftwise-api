@@ -37,6 +37,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        // The supervisor web app: static files, data still needs a token
+                        .requestMatchers(HttpMethod.GET, "/", "/index.html", "/app/**", "/favicon.svg").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
                                 "/actuator/health").permitAll()
                         .anyRequest().authenticated())

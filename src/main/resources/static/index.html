@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shiftwise · Coverage board</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app/app.css">
+</head>
+<body>
+
+<!-- Sign in -->
+<section id="login-view" class="login" hidden>
+  <div class="login-card">
+    <p class="brand"><span class="dot"></span>shiftwise</p>
+    <h1>Shift scheduling for facility teams</h1>
+    <p class="muted">Coverage per area, staff skills, split shifts, rest rules and fair replacements when someone is absent. All data here is invented.</p>
+    <button id="demo-login" class="btn primary wide" type="button">Try it as a supervisor</button>
+    <details class="other-login">
+      <summary>Sign in with another account</summary>
+      <form id="login-form">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" required value="admin@shiftwise.dev">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" required value="demo1234">
+        <button class="btn wide" type="submit">Sign in</button>
+      </form>
+    </details>
+    <p class="small muted">API docs: <a href="/swagger-ui.html">Swagger UI</a> · Code: <a href="https://github.com/AhmedSh10/shiftwise-api">GitHub</a></p>
+  </div>
+</section>
+
+<!-- App -->
+<div id="app-view" hidden>
+  <header class="topbar">
+    <p class="brand"><span class="dot"></span>shiftwise</p>
+    <div class="week-nav">
+      <button class="icon-btn" id="prev-week" type="button" aria-label="Previous week">‹</button>
+      <span id="week-label" class="mono"></span>
+      <button class="icon-btn" id="next-week" type="button" aria-label="Next week">›</button>
+    </div>
+    <div class="top-actions">
+      <button class="btn primary" id="generate-btn" type="button">Fill this week…</button>
+      <span id="who" class="muted small"></span>
+      <button class="btn ghost" id="logout" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <nav id="days" class="days" aria-label="Days of the week"></nav>
+
+  <main class="layout">
+    <section class="board-wrap">
+      <div class="board-head">
+        <h2 id="day-title"></h2>
+        <div class="legend small">
+          <span><i class="sw green"></i>covered</span>
+          <span><i class="sw yellow"></i>1 short</span>
+          <span><i class="sw red"></i>2+ short</span>
+        </div>
+      </div>
+      <div id="board" class="board" role="grid" aria-label="Coverage by area and shift"></div>
+      <p class="hint small muted">Pick a cell to see who is on shift and who could cover it.</p>
+    </section>
+
+    <aside id="panel" class="panel">
+      <div class="panel-empty muted">
+        <p class="mono small">// no slot selected</p>
+        <p>Pick an area and shift on the board.</p>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<!-- Generate dialog -->
+<div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-card">
+    <h2 id="modal-title">Fill this week</h2>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="modal-close" type="button">Close</button>
+      <button class="btn primary" id="modal-apply" type="button" hidden>Save this plan</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="/app/app.js"></script>
+</body>
+</html>
