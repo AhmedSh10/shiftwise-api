@@ -30,4 +30,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select e from Employee e where e.id = :id")
     Optional<Employee> findByIdForUpdate(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = "skills")
+    List<Employee> findByActiveTrueOrderByIdAsc();
+
+    /** Locks every active employee, in id order so concurrent callers cannot deadlock. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select e from Employee e where e.active = true order by e.id")
+    List<Employee> lockAllActive();
 }
