@@ -9,6 +9,9 @@ Shift scheduling for facility-services teams: the cleaning crews that keep a hos
 
 Inspired by real work on a hospital cleaning contract in Milan. All data in this repository is invented.
 
+**▶ Live demo: [shiftwise-api.onrender.com](https://shiftwise-api.onrender.com)**: press *Try it as a supervisor*. API docs: [Swagger UI](https://shiftwise-api.onrender.com/swagger-ui.html).
+Free hosting: the first visit after a quiet spell can take about a minute to wake up. The demo data resets on every restart and every night, so change whatever you like.
+
 ![Coverage board: areas by shift, green, yellow and red cells, and ranked replacements for the selected slot](docs/coverage-board.png)
 
 ## The problem
@@ -39,7 +42,7 @@ On a hospital site the schedule is still built by hand by supervisors, and it br
 - [x] **Week 1:** domain model, JWT and roles, assignments with skill and overlap checks, coverage board, Testcontainers tests, Docker, CI
 - [x] **Week 2:** 11-hour rest rule between working days, weekly contract hours, absences, shift swaps, row lock against concurrent overlapping bookings
 - [x] **Web app:** supervisor board served by Spring Boot (plain HTML, CSS and JavaScript): week strip, coverage grid, mark absent, ranked replacements, fill the week with preview
-- [ ] **Live demo:** deploy with a daily data reset
+- [x] **Live demo:** on Render, with the database re-seeded on start and nightly (`demo` profile)
 - [x] **Week 3:** replacement suggestions when someone is absent, weekly schedule generation with dry run
 
 ## Run it
